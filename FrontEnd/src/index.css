@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+
+/* 
+.angled-rectangle1 {
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 0% 100%);
+}
+
+
+.angled-rectangle2 {
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 0% 100%);
+}
+
+
+.angled-rectangle3 {
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 0% 100%);
+}
+
+.angled-rectangle4 {
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 0% 100%);
+} */
