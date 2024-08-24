@@ -14,6 +14,8 @@ function NavBar() {
         </h1>
       </div>
 
+
+
       <div className="absolute w-[330px] h-[150px] bg-[#c42703] angled-rectangle2 z-20"></div>
 
       <div className="absolute left-[280px] h-[55px] bg-white angled-rectangle3 right-0">
