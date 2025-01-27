@@ -1,31 +1,73 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const MongoStore = require("connect-mongo");
 const app = express();
+const path = require('path');
+const multer = require('multer');
+
+// Set up storage engine
+const storage = multer.diskStorage({
+    destination: './uploads/',
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`);
+    },
+});
+
+const upload = multer({ storage });
+
+
+// Global variable to hold the user ID
+let globalUserId = null; // Global variable
 
 // Import routes
 const AdminCustomersManage = require("./routes/UserRouter");
+const ImageHandling = require("./routes/ImageRouter");
+const CustomerOtp = require("./routes/CustomerOtp")
+const Packages = require("./routes/PackageRouter");
+const ServiceRouter = require("./routes/ServiceRouter");
+const AppointmentRouter = require("./routes/AppointmentRouter");
+const OfferRouter = require('./routes/OfferRouter');
+const ReferralRouter = require('./routes/ReferralRoute');
+const ItemRouteController = require("./routes/ItemRoutes");
+const RecoveryFormManage = require("./routes/RecoveryForm");
+const DriversFormManage = require("./routes/DriversForm");
+const cartRouter = require('./routes/CartRouter');
+const SmsOTP = require('./routes/SmsOTP');
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173', // Replace with your frontend URL
+    credentials: true, // Allow credentials (cookies) to be sent
+}));
+
 app.use("/AdminCustomers", AdminCustomersManage);
+app.use("/SendCustomerOtp", CustomerOtp);
+
+app.use("/SmsOtpSend", SmsOTP);
 
 
+app.use("/ImageUploads", ImageHandling);
 
+app.use('/Packages', Packages);
+app.use('/services', ServiceRouter);
 
+app.use("/appointment", AppointmentRouter);
 
+app.use('/offers', OfferRouter);
+app.use('/referrals', ReferralRouter);
 
+app.use("/ItemRoutes", ItemRouteController);
 
+app.use("/RecoveryForm", RecoveryFormManage);
+app.use("/DriversForm", DriversFormManage);
+app.use('/api/cart', cartRouter);
 
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads/')));
 
 // MongoDB connection
-mongoose
-    .connect(
-        process.env.MONGO_URI ||
-        "mongodb+srv://5gang:ocjaIzGYFjpYlih2@cluster0.zk7k9.mongodb.net/Wash_and_GO"
-    )
+mongoose.connect(process.env.MONGO_URI || "mongodb+srv://5gang:ocjaIzGYFjpYlih2@cluster0.zk7k9.mongodb.net/Wash_and_GO")
     .then(() => console.log("Connected to MongoDB"))
     .then(() => {
         app.listen(5000, () => {
@@ -35,81 +77,65 @@ mongoose
     .catch((err) => console.log(err));
 
 
+// Upload endpoint
+app.post('/upload', upload.single('file'), (req, res) => {
+    res.send({ filePath: `/uploads/${req.file.filename}` });
+});
+
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+
+////////////////////////////////////////
 
 
-
+// Register route
 require("./models/Register");
 const User = mongoose.model("Register");
 
 app.post("/register", async (req, res) => {
-
     const { FirstName, LastName, Address, MobileNumber, NIC, Email, Password } = req.body;
 
     try {
-        // Check if a user with the same email already exists
         const existingUser = await User.findOne({ Email });
-        console.log(existingUser)
         if (existingUser) {
             return res.send({ status: "error", message: "Email already registered" });
         }
 
-        // Create a new user if the email is not taken
-        await User.create({
-            FirstName,
-            LastName,
-            Address,
-            MobileNumber,
-            NIC,
-            Email,
-            Password // In a real application, you should hash the password before saving
-        });
-
+        await User.create({ FirstName, LastName, Address, MobileNumber, NIC, Email, Password });
         res.send({ status: "ok" });
     } catch (err) {
-        console.error(err); // Log error for debugging
+        console.error(err);
         res.send({ status: "error", message: "An error occurred while registering. Please try again." });
     }
 });
 
-
-
 // Login route
-
-
 require("./models/Admin");
-const Admin = mongoose.model("Admin")
-
-
+const Admin = mongoose.model("Admin");
 
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
-
     try {
-        // Check in User table
         let user = await User.findOne({ Email: email });
-        console.log(user)
 
-        // Check in Admin table if not found in User table
         if (!user) {
             user = await Admin.findOne({ email });
-
-
         }
 
         if (!user) {
             return res.json({ error: "User Not Found" });
         }
-        console.log(user.Password)
-        // Check if the password matches (no hashing, plain text comparison)
+
+        // Check password directly
         if (user.Password === password) {
-            // Determine user role based on model
+
+            globalUserId = user._id; // Set the global variable
 
             const role = user instanceof Admin ? 'admin' : 'customer';
 
             return res.send({
                 status: "ok",
-
                 role: role,
                 redirect: role === 'admin' ? "/admin-dashboard" : "/customer-dashboard"
             });
@@ -119,5 +145,55 @@ app.post("/login", async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server Error" });
+    }
+});
+
+// Logout route
+app.post("/logout", (req, res) => {
+    globalUserId = null; // Reset the global variable on logout
+    res.status(200).json({ message: 'Logout successful' });
+});
+
+
+
+// Session route
+app.get("/Session", async (req, res) => {
+    if (globalUserId) {
+        try {
+
+            let user = await User.findById(globalUserId);
+
+            if (!user) {
+
+                user = await Admin.findById(globalUserId);
+
+                if (!user) {
+                    return res.status(404).json({ status: "error", message: "User or Admin not found" });
+                }
+
+                // If found in the Admin collection, send a response with role info
+                return res.json({
+                    adminId: globalUserId,
+                    Name: user.name,
+
+                });
+            }
+
+            // If found in the User collection, send the original JSON response
+            res.json({
+                userId: globalUserId,
+                Fname: user.FirstName,
+                Lname: user.LastName,
+                Address: user.Address,
+                Email: user.Email,
+                MobileNumber: user.MobileNumber,
+                NIC: user.NIC,
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ status: "error", message: "Failed to retrieve user or admin data" });
+        }
+    } else {
+        res.status(401).json({ status: "error", message: "Unauthorized" });
     }
 });

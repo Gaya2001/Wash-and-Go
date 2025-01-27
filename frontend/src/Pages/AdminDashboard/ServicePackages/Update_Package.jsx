@@ -1,33 +1,82 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import SideNavBar from '../../../components/Dashboards/SideNavBar';
 import Header from '../../../components/Dashboards/Header';
+import axios from 'axios';
 
 export default function UpdatePackage() {
-
   const navigate = useNavigate();
+  const { id } = useParams();// Get the package ID from the URL 
+  console.log('Package ID from params:', id);  // Check if the ID is correct
+ 
+  const fileInputRefs = useRef([React.createRef(), React.createRef(), React.createRef(), React.createRef()]);
 
-  const [services, setServices] = useState([{ id: 1, service: '' }]);
+  const [formData, setFormData] = useState({
+    id: '',
+    PackageName: '',
+    Description1: '',
+    Description2: '',
+    Price: 0,
+    EstimatedTime: 0,
+    Statues: 'Active'
+  });
 
-  // Function to handle adding a new service input field
-  const addService = () => {
-    setServices([...services, { id: services.length + 1, service: '' }]);
+  const [serviceOptions, setServiceOptions] = useState([]);
+  const [loading, setLoading] = useState(true); // Add loading state
+
+  useEffect(() => {
+    // Fetch package details to pre-fill the form
+    const fetchPackageDetails = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/packages/${id}`);
+        if (response.status === 200 && response.data) {
+          const packageData = response.data;
+
+          // Ensure formData matches structure of fetched packageData
+          setFormData({
+            id: packageData.id || '',
+            PackageName: packageData.PackageName || '',
+            Description1: packageData.Description1 || '',
+            Description2: packageData.Description2 || '',
+            Price: packageData.Price || 0,
+            EstimatedTime: packageData.EstimatedTime || 0,
+            Statues: packageData.Statues || 'Active'
+          });
+
+          setLoading(false); // Set loading to false once data is fetched
+        }
+      } catch (error) {
+        console.error('Error fetching package details:', error);
+        setLoading(false); // Ensure loading is set to false in case of an error
+      }
+    };
+
+    fetchPackageDetails();
+  }, [id]);
+
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  // Function to handle input change
-  const handleServiceChange = (index, event) => {
-    const { name, value } = event.target;
-    const values = [...services];
-    values[index][name] = value;
-    setServices(values);
+  // Handle form submission for updating the package
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.put(`http://localhost:5000/packages/${id}`, formData);
+      if (response.status === 200) {
+        console.log('Package updated successfully:', response.data);
+        navigate('/dash_packages');
+      }
+    } catch (error) {
+      console.error('Error updating package:', error);
+    }
   };
 
-  // Function to handle deleting a service input field
-  const deleteService = (index) => {
-    const values = [...services];
-    values.splice(index, 1);
-    setServices(values);
-  };
+  if (loading) {
+    return <div>Loading...</div>; // Display loading message while data is being fetched
+  }
 
   return (
     <div className="flex max-h-screen">
@@ -36,7 +85,6 @@ export default function UpdatePackage() {
       <div className="h-screen flex-1 flex flex-col">
         <Header />
 
-        {/* Main Content Area */}
         <main className="h-1 flex-1 bg-gray-100">
           <div className="h-[700px] m-5 p-6 bg-gray-50 border-2 border-solid border-gray-300">
             <button
@@ -45,90 +93,90 @@ export default function UpdatePackage() {
             >
               Back
             </button>
-            <div className='h-full bg-white p-5 w-1/2 overflow-y-auto mx-auto rounded-xl'>
-              {/* Form Section */}
+            <div className='h-full bg-white px-32 p-5 w-4/5 overflow-y-auto mx-auto rounded-xl'>
               <div className="w-full bg-white p-6 rounded-lg shadow-md mb-6 mx-auto">
                 <h1 className='text-center font-bold text-2xl bg-gray-700 text-white rounded-lg p-2 mb-5'>UPDATE PACKAGE</h1>
-                <form action="">
+                <form onSubmit={handleSubmit}>
                   <div className="mb-4">
-                    <label htmlFor="name" className="block font-semibold mb-2">Name</label>
-                    <input type="text" name="name" placeholder="Enter full name" id="name" className="border border-black rounded-md w-full p-1 hover:shadow-md hover:duration-300" />
+                    <label htmlFor="PackageName" className="block text-sm font-semibold">Package Name</label>
+                    <input
+                      type="text"
+                      name="PackageName"
+                      id="PackageName"
+                      value={formData.PackageName}
+                      placeholder={formData.PackageName}
+                      onChange={handleInputChange}
+                      className="border border-gray-300 p-2 rounded w-full"
+                    />
                   </div>
 
                   <div className="mb-4">
-                    <label htmlFor="descript1" className="block font-semibold mb-2">Package Description 1</label>
-                    <textarea type="text" name="descript1" placeholder="Enter first description" id="descript1" className="border border-black rounded-md w-full p-1 min-h-20 hover:shadow-md hover:duration-300" />
+                    <label htmlFor="Description1" className="block text-sm font-semibold">Description 1</label>
+                    <textarea
+                      name="Description1"
+                      id="Description1"
+                      value={formData.Description1}
+                      onChange={handleInputChange}
+                      className="border border-gray-300 p-2 rounded w-full"
+                    />
                   </div>
 
                   <div className="mb-4">
-                    <label htmlFor="descript2" className="block font-semibold mb-2">Package Description 2</label>
-                    <textarea type="text" name="descript2" id="descript2" placeholder="Enter second description" className="border border-black rounded-md w-full p-1 min-h-20 hover:shadow-md hover:duration-300" />
+                    <label htmlFor="Description2" className="block text-sm font-semibold">Description 2</label>
+                    <textarea
+                      name="Description2"
+                      id="Description2"
+                      value={formData.Description2}
+                      onChange={handleInputChange}
+                      className="border border-gray-300 p-2 rounded w-full"
+                    />
                   </div>
 
                   <div className="mb-4">
-                    <label htmlFor="services" className="block font-semibold mb-2">Services</label>
-                    {services.map((service, index) => (
-                      <div key={index} className="mb-2 flex gap-3 items-center">
-                        <input
-                          type="text"
-                          name="service"
-                          placeholder={`Service ${index + 1}`}
-                          className="border border-black rounded-md w-full p-2 hover:shadow-md hover:duration-300"
-                          value={service.service}
-                          onChange={(event) => handleServiceChange(index, event)}
-                        />
-                        {/* X icon button */}
-                        <button
-                          type="button"
-                          onClick={() => deleteService(index)}
-                          className="text-red-500 hover:text-red-700 hover:duration-300"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            className="w-5 h-5"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={addService}
-                      className="text-blue-500 hover:underline hover:duration-300">
-                      + Add a Service
-                    </button>
+                    <label htmlFor="Price" className="block text-sm font-semibold">Price</label>
+                    <input
+                      type="number"
+                      name="Price"
+                      id="Price"
+                      value={formData.Price}
+                      onChange={handleInputChange}
+                      className="border border-gray-300 p-2 rounded w-full"
+                    />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="mb-4">
-                      <label htmlFor="eTime" className="block font-semibold mb-2">Estimated Time</label>
-                      <input type="text" name="eTime" id="eTime" placeholder="Enter estimated time" className="border border-black rounded-md w-full p-1 hover:shadow-md hover:duration-300" />
-                    </div>
-                    <div className="mb-4">
-                      <label htmlFor="price" className="block font-semibold mb-2">Price</label>
-                      <input type="text" name="price" id="price" placeholder="Enter price" className="border border-black rounded-md w-full p-1 hover:shadow-md hover:duration-300" />
-                    </div>
+                  <div className="mb-4">
+                    <label htmlFor="EstimatedTime" className="block text-sm font-semibold">Estimated Time (in hours)</label>
+                    <input
+                      type="number"
+                      name="EstimatedTime"
+                      id="EstimatedTime"
+                      value={formData.EstimatedTime}
+                      onChange={handleInputChange}
+                      className="border border-gray-300 p-2 rounded w-full"
+                    />
                   </div>
+
+                  <div className="mb-4">
+                    <label htmlFor="Statues" className="block text-sm font-semibold">Status</label>
+                    <select
+                      name="Statues"
+                      id="Statues"
+                      value={formData.Statues}
+                      onChange={handleInputChange}
+                      className="border border-gray-300 p-2 rounded w-full"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded"
+                  >
+                    Update Package
+                  </button>
                 </form>
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  {[1, 2, 3, 4].map((index) => (
-                    <div key={index} className="relative w-auto h-32 bg-gray-300 rounded-lg shadow-md flex items-center justify-center  hover:shadow-xl hover:duration-300">
-                      <div className="absolute bottom-0 right-0 m-3">
-                        <button className="px-2 py-2 bg-black text-white font-semibold rounded-md text-xs shadow-md hover:bg-gray-700 hover:shadow-gray-700 hover:duration-300">
-                          Change Image
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {/* Add Package Button */}
-                <button className="px-3 py-2 bg-black text-white font-semibold rounded-md shadow-md mt-5 flex mx-auto hover:bg-gray-700 hover:shadow-gray-700 hover:duration-300">
-                  Update Package
-                </button>
               </div>
             </div>
           </div>

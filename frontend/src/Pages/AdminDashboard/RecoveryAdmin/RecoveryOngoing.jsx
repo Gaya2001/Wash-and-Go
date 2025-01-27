@@ -1,0 +1,95 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import RecoverySideNavBar from "./../../../components/NavBar/RecoverySideNavBar";
+import Header from "./../../../components/Dashboards/Header";
+
+const PendingRequests = () => {
+  const [requests, setRequests] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        // Fetch all recovery requests from the backend
+        const response = await axios.get("http://localhost:5000/RecoveryForm");
+        // Store all requests in the state
+        setRequests(response.data.recovery);
+        console.log(response.data.recovery);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchRequests();
+  }, []);
+
+  // Filter only the requests where States === "pending"
+  const pendingRequests = requests.filter(
+    (request) => request.States === "ongoing"
+  );
+  console.log(pendingRequests);
+
+  const handleDetailsClick = (userId) => {
+    navigate(`/Onging-details/${userId}`);
+  };
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <RecoverySideNavBar />
+      <div className="flex-1 flex flex-col">
+        <Header />
+        <div className="flex-1 p-10">
+          <div className="bg-blue-100 p-8 rounded-lg h-screen">
+            <h1 className="text-3xl font-bold mb-6">Ongoing Requests</h1>
+
+            {pendingRequests.length === 0 ? (
+              // Show this message if there are no pending requests
+              <p className="text-center text-xl text-gray-700">
+                No Ongoing requests.
+              </p>
+            ) : (
+              <table className="min-w-full bg-blue-200 text-gray-700 rounded-lg">
+                <thead>
+                  <tr>
+                    <th className="py-3 px-4 text-left">No.</th>
+                    <th className="py-3 px-4 text-left">Name</th>
+                    <th className="py-3 px-4 text-left">Email Address</th>
+                    <th className="py-3 px-4 text-left">
+                      Vehicle Registration
+                    </th>
+                    <th className="py-3 px-4 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingRequests.map((request, index) => (
+                    <tr key={request._id} className="border-t border-gray-300">
+                      <td className="py-3 px-4">
+                        {String(index + 1).padStart(2, "0")}
+                      </td>
+                      <td className="py-3 px-4">{request.Name}</td>
+                      <td className="py-3 px-4">{request.EmailAddress}</td>
+                      <td className="py-3 px-4">
+                        {request.VehicleRegistrationNumber}
+                      </td>
+                      <td className="py-3 px-4">
+                        <button
+                          className="bg-blue-500 flex m-auto text-white px-4 py-1 rounded-md hover:bg-blue-600"
+                          onClick={() => handleDetailsClick(request._id)}
+                        >
+                          Details
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PendingRequests;

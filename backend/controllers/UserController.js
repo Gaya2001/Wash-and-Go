@@ -5,6 +5,7 @@ const getAllUsers = async (req, res) => {
         const users = await User.find();
         if (!users || users.length === 0) {
             return res.status(404).json({ message: "No users found" });
+
         }
         return res.status(200).json({ users });
     } catch (err) {
@@ -43,6 +44,8 @@ const getById = async (req, res, next) => {
 
     let user;
 
+
+
     try {
         user = await User.findById(id);
     } catch (err) {
@@ -53,7 +56,7 @@ const getById = async (req, res, next) => {
         return res.status(400).json({ message: "User not found" });
     }
 
-    // Display all users
+    // Display the  users
 
     return res.status(200).json({ user });
 };
@@ -64,7 +67,7 @@ const getById = async (req, res, next) => {
 
 const UpdateUser = async (req, res, next) => {
     const id = req.params.id;
-    const { FirstName, LastName, Address, MobileNumber, NIC } = req.body;
+    const { FirstName, LastName, Address, MobileNumber, NIC, Email, Password } = req.body;
 
     let user;
 
@@ -74,8 +77,9 @@ const UpdateUser = async (req, res, next) => {
             LastName: LastName,
             Address: Address,
             MobileNumber: MobileNumber,
-            NIC: NIC,    // Admin is not be able to edit customer Credentials .
-
+            NIC: NIC,
+            Email: Email,
+            Password: Password,
         });
         await user.save();
     } catch (err) {

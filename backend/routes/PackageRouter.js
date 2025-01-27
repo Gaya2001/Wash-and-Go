@@ -1,23 +1,18 @@
 const express = require("express");
+const router = express.Router();
 const PackageController = require("../controllers/PackageController");
-const PackageRouter = express.Router();
 
-PackageRouter.get("/:id?", async (req, res) => {
-    try {
-        const data = await new PackageController().get(req.params.id);
-        res.json(data);
-    } catch (error) {
-        res.status(500).json({ error: error.toString() });
-    }
-});
+// Define route and link to controller method
+router.get("/", PackageController.GetPackages);
 
-PackageRouter.post("/store", async (req, res) => {
-    try {
-        const data = await new PackageController().store(req.body);
-        res.json({ message: data });
-    } catch (error) {
-        res.status(500).json({ error: error.toString() });
-    }
-});
+router.post("/",PackageController.addPackage );
 
-module.exports = PackageRouter;
+router.get("/:id", PackageController.getPackageById);
+
+router.put("/:id", PackageController.UpdatePackage);
+
+router.delete("/:id", PackageController.DeletePackage);
+
+
+// Export the router
+module.exports = router;

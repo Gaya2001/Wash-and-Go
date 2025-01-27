@@ -13,22 +13,28 @@ export default function SideNavBar() {
           <ul className="space-y-5 font-bold text-xl text-center">
 
             <li className="px-4 py-3 hover:bg-gray-700 hover:duration-300">
-              <SideNavLinks linkName="DASHBOARD" url="/dashboard" className="" />
+              <SideNavLinks linkName="DASHBOARD" url="/dashboard" />
             </li>
             <li className="px-4 py-3 hover:bg-gray-700 hover:duration-300">
               <SideNavLinks linkName="CUSTOMER DETAILS" url="/cus_details" />
             </li>
             <li className="px-4 py-3 hover:bg-gray-700 hover:duration-300">
-              <SideNavLinks linkName="PACKAGES" url="/Homepackages" />
+              <SideNavLinks linkName="PACKAGES" url="/dash_packages" />
             </li>
             <li className="px-4 py-3 hover:bg-gray-700 hover:duration-300">
-              <SideNavLinks linkName="INVENTORY" url="/inventory" />
+              <SideNavLinks linkName="INVENTORY" url="/StoreDashboard" />
             </li>
             <li className="px-4 py-3 hover:bg-gray-700 hover:duration-300">
-              <SideNavLinks linkName="RECOVERY" url="/recovery" />
+              <SideNavLinks linkName="RECOVERY" url="/Dashboard/recoveryDash" />
             </li>
             <li className="px-4 py-3 hover:bg-gray-700 hover:duration-300">
-              <SideNavLinks linkName="RESERVATIONS" url="/reservations" />
+              <SideNavLinks linkName="RESERVATIONS" url="/reservation" />
+            </li>
+            <li className="px-4 py-3 hover:bg-gray-700 hover:duration-300">
+              <SideNavLinks linkName="OFFERS" url="/offers_dash" />
+            </li>
+            <li className="px-4 py-3 hover:bg-gray-700 hover:duration-300">
+              <SideNavLinks linkName="REFERRALS" url="/referrals_dash" />
             </li>
           </ul>
         </nav>

@@ -5,22 +5,40 @@ import AboutSection from './Pages/Home/AboutSection'
 import Offer from './Pages/Home/Offer'
 import Footer from './components/Footer/Footer'
 import PackageSection from './Pages/Home/PackageSection'
+import Test from './Test'
+
 
 function App() {
     return (
-        <div>
 
 
-            <HomeNavbar />
-            <HeroSection />
 
+        <div  >
+
+            <div className='h-screen'>
+                <HomeNavbar />
+                <HeroSection />
+            </div>
             <AboutSection />
             <PackageSection />
             <Offer />
             <Footer />
 
 
+
         </div >
+
+
+
+
+        // <SessionProvider>
+
+        //     <Test />
+        // </SessionProvider>
+
+
+
+
     )
 }
 

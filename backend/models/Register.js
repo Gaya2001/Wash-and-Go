@@ -15,7 +15,7 @@ const regiSchema = new Schema({
         required: true, // validate
     },
     MobileNumber: {
-        type: Number, // Data type
+        type: String, // Data type
         required: true, // validate
     },
     NIC: {

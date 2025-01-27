@@ -5,24 +5,27 @@ import { FaRegClock } from "react-icons/fa";
 import { IoLocationOutline } from "react-icons/io5";
 import { FaFacebookF } from "react-icons/fa";
 import { FaTwitter } from "react-icons/fa";
-import { FaLinkedinIn } from "react-icons/fa6";
+import { FaLinkedinIn } from "react-icons/fa";
 import { FaGoogle } from "react-icons/fa";
 import { IoCartOutline } from "react-icons/io5";
 
 
 function StoreNavbar() {
     return (
-        <div className=" h-[25vh] ">
+        <div className=" h-[25vh] relative ">
             {/* Header Section */}
-            <div className="z-40 absolute w-[280px] h-[132px] bg-[#006AFF] angled-rectangle1">
+            <div className="w-screen justify-between flex">
+            <div className="height-fit w-[280px]">
+            <div className="absolute z-40 w-[280px] h-[132px] bg-[#006AFF] angled-rectangle1">
                 <h1 className="text-white font-bold text-6xl absolute top-[48px] left-[38px]">
                     LOGO
                 </h1>
             </div>
 
-            <div className="absolute w-[330px] h-[132px] bg-[#386097] angled-rectangle2 z-20"></div>
-
-            <div className="absolute left-[280px] h-[55px] bg-white angled-rectangle3 right-0 flex justify-between items-center ">
+            <div className="w-[330px] h-[132px] bg-[#386097] angled-rectangle2 z-20"></div>
+            </div>
+            <div className="w-full">
+            <div className="h-[55px] bg-white angled-rectangle3 right-0 flex justify-between items-center ">
                 <div className="font-bold text-xl ml-5">
                     Welcome to LOGO Store
                 </div>
@@ -36,7 +39,7 @@ function StoreNavbar() {
                 </div>
             </div>
 
-            <div className="text-white z-30 relative top-[55px] h-[77px] bg-[#161920] angled-rectangle4">
+            <div className="text-white z-40 top-[55px] h-[77px] bg-[#161920] angled-rectangle4 w-full">
                 <div className="flex gap-16 ml-[250px]">
                     <div className="flex items-center gap-2 ml-10 mt-4">
                         <div>
@@ -69,8 +72,9 @@ function StoreNavbar() {
                     </div>
                 </div>
             </div>
-
-            <div className="bg-black h-[55px] relative top-[55px] right-0 left-0 flex items-center border-b-white">
+            </div>
+            </div>
+            <div className="bg-black h-[55px] right-0 left-0 flex items-center border-b-white">
                 <ul className="text-white font-semibold gap-14 relative left-[110px] flex items-center  ">
                     <li className="hover:text-[#006AFF] transition duration-200 cursor-pointer">HOME</li>
                     <li className="hover:text-[#006AFF] transition duration-200 cursor-pointer">SHOP</li>

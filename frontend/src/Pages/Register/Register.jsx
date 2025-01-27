@@ -44,7 +44,17 @@ function Register() {
         }
         if (!formData.NIC.trim()) {
             errors.NIC = 'NIC Number is required';
+        } else {
+            // Regular expressions to match the old and new NIC formats
+            const oldNICPattern = /^[0-9]{9}[vV]$/; // 9 digits followed by 'V' or 'v'
+            const newNICPattern = /^[0-9]{12}$/;    // 12 digits
+
+            // Check if the NIC matches either pattern
+            if (!oldNICPattern.test(formData.NIC) && !newNICPattern.test(formData.NIC)) {
+                errors.NIC = 'Invalid NIC Number format';
+            }
         }
+
         if (!emailRegex.test(formData.Email)) {
             errors.Email = 'Invalid email format';
         }

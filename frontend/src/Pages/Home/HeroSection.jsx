@@ -1,5 +1,6 @@
 import React from "react";
 import { Carousel } from "react-responsive-carousel";
+import { Link } from 'react-router-dom';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Hero1 from "../../assets/Home/Car2.jpg"
 import Hero2 from "../../assets/Home/Car1.jpg"
@@ -30,7 +31,7 @@ export default function HeroSection() {
     ];
 
     return (
-        <div className="relative w-full h-full min-h-[75vh] overflow-hidden">
+        <div className="relative w-full h-full min-h-[75vh] overflow-hidden " id="HeroSection">
             <Carousel
                 showThumbs={false}
                 autoPlay
@@ -48,7 +49,7 @@ export default function HeroSection() {
                                 backgroundRepeat: "no-repeat",
                                 backgroundPosition: "center",
                                 backgroundSize: "cover",
-                                minHeight: "82vh",
+                                minHeight: "76vh",
                             }}
                         >
                             <div className="absolute inset-0 bg-black opacity-50"></div>
@@ -59,10 +60,11 @@ export default function HeroSection() {
                                     <span className="text-[#0BEEFD]">Amazing</span>
                                 </h1>
                                 <p className="mt-4 text-lg md:text-xl">{slide.description}</p>
-                                <button className="bg-transparent hover:bg-[#006AFF] px-4 py-3 text-xl text-[#006AFF] hover:text-white border-2 font-bold   border-[#006AFF] rounded-md shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 ease-in-out mt-4 w-[30%]">
-                                    {slide.buttonText}
-                                </button>
-
+                                <Link to="/appointment">
+                                    <button className="bg-transparent hover:bg-[#006AFF] px-4 py-3 text-xl text-[#006AFF] hover:text-white border-2 font-bold   border-[#006AFF] rounded-md shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 ease-in-out mt-4 w-[30%]">
+                                        {slide.buttonText}
+                                    </button>
+                                </Link>
 
                             </div>
                         </div>
